@@ -1,0 +1,4 @@
+---
+  - src: RocketChat.Server
+    version: v2.0
+    path: roles
