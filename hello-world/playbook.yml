@@ -1,0 +1,42 @@
+---
+- hosts: all
+
+  vars:
+    node_apps_location: /opt/webapps
+
+  pre_tasks:
+    - name: Update apt cache if needed.
+      apt: update_cache=yes cache_valid_time=3600
+
+  tasks:
+    - name: Install required software to run our NodeJS app.
+      apt: "name={{ item }} state=present"
+      with_items:
+        - nodejs
+        - npm
+
+    - name: Create sym link for nodejs due to non standard name in Debian package.
+      file: src=/usr/bin/nodejs
+            dest=/usr/bin/node
+            state=link
+
+    - name: Install Forever (to run our Node.js app).
+      npm: name=forever global=yes state=present
+
+    - name: Ensure Node.js app folder exists.
+      file: "path={{ node_apps_location }} state=directory"
+
+    - name: Copy example Node.js app to server.
+      copy: "src=app dest={{ node_apps_location }}"
+
+    - name: Install app dependencies defined in package.json.
+      npm: "path={{ node_apps_location }}/app"
+
+    - name: Check list of running Node.js apps.
+      command: forever list
+      register: forever_list
+      changed_when: false
+
+    - name: Start example Node.js app.
+      command: "forever start {{ node_apps_location }}/app/app.js"
+      when: "forever_list.stdout.find('{{ node_apps_location }}/app/app.js') == -1"
