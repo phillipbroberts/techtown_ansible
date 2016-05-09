@@ -74,3 +74,20 @@ Once completed you can test that we are getting *hello world* by hitting port 80
 curl http://localhost:8080
 ```
 
+
+## More complex example using a role
+
+Our next example is a server running rocket.chat, a software package aimed at providing an in-house service similar to Slack.
+
+This example moves most of the task execution out of the main playbook and in to a role.
+
+```
+cd rocket-chat
+cat playbook.yml
+```
+
+You will see our main playbook is extremely basic, and all the logic has moved in to our rocketchat role, have a look through the various tasks in roles/rocketchat/tasks starting with main.yml to get a feel for how this role sets up the rocketchat stack.
+
+Bring the virtual machine up and make sure the service gets installed successfully by opening a browser to http://localhost:3000/
+
+
