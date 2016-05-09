@@ -1,0 +1,15 @@
+---
+## Deploy Apt source custom template
+apt_update_source_list         : "template"  
+
+## use Australian mirror
+apt_update_source_list_mirror  : "http://au.archive.ubuntu.com/ubuntu/" 
+
+## Install unattended package
+unattended_install             : True
+
+apt_default_packages           :
+                                  - software-properties-common
+                                  - unattended-upgrades
+                                  - language-pack-en-base
+                                  - unzip
