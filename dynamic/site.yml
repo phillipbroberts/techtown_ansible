@@ -1,0 +1,10 @@
+---
+- name: print out operating system
+  hosts: all
+  gather_facts: True
+  vars:
+  - wpversion: 123
+
+  tasks:
+  - debug: var=hostvars[inventory_hostname]
+
