@@ -31,7 +31,7 @@ nodes = {
 VAGRANTFILE_API_VERSION = '2'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |global_config|
-  global_config.vm.box = 'techtown/debian-8.4.0'
+  global_config.vm.box = 'techtown/ubuntu-14.04'
   
   global_config.vm.provider "virtualbox" do |vb|
     vb.memory = "256"

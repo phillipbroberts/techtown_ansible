@@ -134,3 +134,53 @@ You can also run one off commands like:
 ansible postgres000.dev.example.com -i development.ini -m command -a "uptime"
 ```
 
+## WordPress Example
+
+In the wordpress-nginx folder you will find a more complete example of a deployment using multiple roles and group variables.
+
+The site.yml is intentionally minimal, all logic has been moved out to roles, and those roles are configured using the group_vars/all file.
+
+## Docker
+
+The Docker folder contains an example of configuring an instance for hosting docker containers, Ansible has very good support for building and managing Docker containers, the documentation for the Docker module can be found at http://docs.ansible.com/ansible/docker_module.html
+
+## Dynamic inventory
+
+
+The dynamic folder of the repo provides a Vagrant config that will start four virtual machines, we then use the dynamic inventory script found in inventory/dynamic.py to interact with that inventory and perform tasks on it.
+
+You will need the paramiko module to use this inventory script.
+
+```
+pip install paramiko
+```
+
+use 'vagrant up' to start the machines and 'vagrant status' to make sure they are all running.
+
+A dynamic inventory script should provide a list of all hosts given the *--list* argument and should provide details about a single host given the *--host=hostname* argument.
+
+Once the vagrant instances have started try the following commands to see an example:
+
+```
+python inventory/dynamic.py --list
+```
+
+```
+python inventory/dynamic.py --host=db1
+```
+
+Let's first try and get a ping reply from all VMs in our inventory.
+
+```
+ansible all -i inventory -m ping
+```
+
+
+we can dumpout all the setup facts gathered from a specific instance
+
+```
+ansible web1 -i inventory -m setup
+```
+
+Our dynamic  inventory script only knows how to query vagrant for vm information, additional inventory examples can be found in the Ansible repository https://github.com/ansible/ansible/tree/devel/contrib/inventory
+
