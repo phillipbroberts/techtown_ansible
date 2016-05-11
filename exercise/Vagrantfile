@@ -2,15 +2,21 @@
 # vi: set ft=ruby :
 
 nodes = {
-  :node1 => {
-    :hostname => "node1",
+  :ansible => {
+    :hostname => "ansible",
     :ipaddress => "10.99.99.10",
     :primary => true,
     :autostart => true
   },
+  :node1 => {
+    :hostname => "node1",
+    :ipaddress => "10.99.99.20",
+    :primary => false,
+    :autostart => true
+  },
   :node2 => {
     :hostname => "node2",
-    :ipaddress => "10.99.99.20",
+    :ipaddress => "10.99.99.30",
     :primary => false,
     :autostart => true
   }
@@ -22,7 +28,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |global_config|
   global_config.vm.box = 'techtown/ubuntu-14.04'
   
   global_config.vm.provider "virtualbox" do |vb|
-    vb.memory = "1024"
+    vb.memory = "512"
   end
 
   nodes.each do |node, options|
