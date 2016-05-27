@@ -2,19 +2,19 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
+  config.vm.box = "techtown/centos-7.2"
   
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "1024"
   end
   
   config.vm.define "ansible" do |ansible|
-    ansible.vm.box = "techtown/ansible-2.0.2.0"
     ansible.vm.hostname = "ansible"
     ansible.vm.network "private_network", ip: "10.2.3.10"
+    ansible.vm.provision "shell", path: "install_ansible.sh"
   end
   
   config.vm.define "rocketchat" do |rocketchat|
-    rocketchat.vm.box = "techtown/ubuntu-14.04"
     rocketchat.vm.hostname = "rocketchat"
     rocketchat.vm.network "private_network", ip: "10.2.3.20"
     rocketchat.vm.network "forwarded_port", guest: 3000, host: 3000
