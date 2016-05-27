@@ -6,20 +6,18 @@
     node_apps_location: /opt/webapps
 
   pre_tasks:
-    - name: Update apt cache if needed.
-      apt: update_cache=yes cache_valid_time=3600
+    - name: Ensure the EPEL repository is present
+      yum: name=epel-release state=present
+
+    - name: Ensure the EPEL repository GPG key is imported
+      rpm_key: key=/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7 state=present
 
   tasks:
     - name: Install required software to run our NodeJS app.
-      apt: "name={{ item }} state=present"
+      yum: "name={{ item }} state=present"
       with_items:
         - nodejs
         - npm
-
-    - name: Create sym link for nodejs due to non standard name in Ubuntu package.
-      file: src=/usr/bin/nodejs
-            dest=/usr/bin/node
-            state=link
 
     - name: Install Forever (to run our Node.js app).
       npm: name=forever global=yes state=present

@@ -2,8 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "techtown/ubuntu-14.04"
-  # config.vm.box_check_update = false
+  config.vm.box = "techtown/centos-7.2"
   config.vm.hostname = "ansible"
 
   config.vm.provider "virtualbox" do |vb|
