@@ -1,0 +1,55 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+nodes = {
+  :ansible => {
+  :box => "techtown/centos-7.2",
+    :hostname => "ansible.techtownlab.local",
+    :ipaddress => "10.2.3.10",
+    :script => "install_ansible.sh",
+    :primary => true,
+    :autostart => true
+  },
+  :master => {
+  :box => "techtown/centos-7.2",
+    :hostname => "kube-master.techtownlab.local",
+    :ipaddress => "10.2.3.20",
+    :primary => false,
+    :autostart => true
+  },
+  :node1 => {
+  :box => "techtown/centos-7.2",
+    :hostname => "kube-node1.techtownlab.local",
+    :ipaddress => "10.2.3.30",
+    :primary => false,
+    :autostart => true
+  },
+  :node2 => {
+  :box => "techtown/centos-7.2",
+    :hostname => "kube-node2.techtownlab.local",
+    :ipaddress => "10.2.3.40",
+    :primary => false,
+    :autostart => true
+  }
+}
+
+VAGRANTFILE_API_VERSION = '2'
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |global_config|
+  global_config.ssh.insert_key = false
+
+  nodes.each do |node, options|
+    global_config.vm.define node, primary: options[:primary], autostart: options[:autostart] do |node_config|
+    node_config.vm.box = options[:box]
+    if options.has_key?(:box_url)
+      node_config.vm.box_url = options[:box_url]
+    end
+      node_config.vm.hostname = options[:hostname]
+      node_config.vm.network "private_network", ip: options[:ipaddress]
+      if options.has_key?(:script)
+        node_config.vm.provision "shell", path: options[:script]
+      end      
+    end
+  end
+end
