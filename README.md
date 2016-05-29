@@ -96,11 +96,12 @@ Using the [Ansible best practises](http://docs.ansible.com/ansible/playbooks_bes
 
 | Location | Description |
 | --- | --- |
-| ansible.cfg | configuraiton defaults for ansible |
-| development.ini | inventory file for your development environment |
-| production.ini | inventory file for your production environment |
-| staging.ini | inventory file for your staging environment |
+| ansible.cfg | configuration defaults for ansible |
 | requirements.yml | third party roles from ansible galaxy |
+| inventory/ | directory containing your inventory definitions |
+| inventory/development | inventory file for your development environment |
+| inventory/staging | inventory file for your staging environment |
+| inventory/production | inventory file for your production environment |
 | group_vars/ | group variable definitions |
 | group_vars/all/ | apply to all hosts |
 | group_vars/webserver/ | apply to hosts in the webserver group |
@@ -110,7 +111,6 @@ Using the [Ansible best practises](http://docs.ansible.com/ansible/playbooks_bes
 | roles/external/ | any external roles downloaded from ansible galaxy |
 | scripts/ | any internal utility scripts like the example to update external roles |
 
-
 Using this suggested directory structure should give you a good amount of flexibility.
 
 You can update all external roles from ansible galaxy using the ./scripts/update_external_roles.sh  script, just make sure it is defined in requirements.yml first.
@@ -118,20 +118,20 @@ You can update all external roles from ansible galaxy using the ./scripts/update
 You can apply your playbooks to specific environments using a command like:
 
 ```
-ansible-playbook -i development.ini playbooks/webservers.yml
+ansible-playbook -i inventory/development playbooks/webservers.yml
 ```
 
 or
 
 ```
-ansible-playbook -i staging playbooks/site.yml
+ansible-playbook -i inventory/staging playbooks/main.yml
 ```
 
 
 You can also run one off commands like:
 
 ```
-ansible postgres000.dev.example.com -i development.ini -m command -a "uptime"
+ansible postgres000.dev.example.com -i inventory/development -m command -a "uptime"
 ```
 
 ## WordPress Example
