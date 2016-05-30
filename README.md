@@ -147,7 +147,7 @@ The Docker folder contains an example of configuring an instance for hosting doc
 ## Dynamic inventory
 
 
-The dynamic folder of the repo provides a Vagrant config that will start four virtual machines, we then use the dynamic inventory script found in inventory/dynamic.py to interact with that inventory and perform tasks on it.
+The inventory folder of the repo provides a Vagrant config that will start four virtual machines, we then use the dynamic inventory script found in dynamic.py to interact with that inventory and perform tasks on it.
 
 You will need the paramiko module to use this inventory script.
 
@@ -162,7 +162,7 @@ A dynamic inventory script should provide a list of all hosts given the *--list*
 Once the vagrant instances have started try the following commands to see an example:
 
 ```
-python inventory/dynamic.py --list
+python dynamic.py --list
 ```
 
 ```
