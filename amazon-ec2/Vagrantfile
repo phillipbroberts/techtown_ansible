@@ -1,0 +1,12 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "techtown/centos-7.2"
+  config.vm.hostname = "ansible"
+  config.vm.provision "shell", path: "install_ansible.sh"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
+end

@@ -1,0 +1,13 @@
+---
+- name: Create an ubuntu instance on Amazon EC2
+  hosts: localhost
+
+  tasks:
+  - name: start the instance
+    ec2:
+      image: ami-06b94666
+      region: us-west-2
+      instance_type: t2.micro
+      key_name: vagrant
+      group: [web, ssh]
+      instance_tags: { Name: ansible-node1, type: web, env: production }
