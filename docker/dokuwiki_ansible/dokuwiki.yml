@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  become: yes
+
+  roles:
+    - dokuwiki
+    - php5
+    - nginx
+

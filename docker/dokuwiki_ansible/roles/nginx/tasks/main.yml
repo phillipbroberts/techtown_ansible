@@ -1,0 +1,13 @@
+---
+- name: Install packages for nginx
+  apt: "name=nginx-full state=present"
+
+- name: install /etc/nginx/nginx.conf
+  copy: src=nginx.conf dest=/etc/nginx/nginx.conf
+
+- name: install /etc/nginx/conf.d/dokuwiki.conf
+  copy: src=dokuwiki.conf dest=/etc/nginx/conf.d/dokuwiki.conf
+
+- name: disable nginx default configuration
+  command: rm -f /etc/nginx/sites-enabled/default
+

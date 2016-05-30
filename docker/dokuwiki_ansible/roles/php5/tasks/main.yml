@@ -1,0 +1,18 @@
+---
+- name: Install packages for php5
+  apt: "name={{ item }} state=present"
+  with_items:
+    - php5-fpm
+    - php5-cli
+    - php5-curl
+    - php5-gd
+    - php5-mcrypt
+    - unzip
+    - xz-utils
+
+- name: install php.ini
+  copy: src=php.ini dest=/etc/php5/fpm/php.ini
+
+- name: install php-fpm.conf
+  copy: src=php-fpm.conf dest=/etc/php5/fpm/php-fpm.conf
+

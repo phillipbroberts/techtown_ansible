@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Create the jenkins data dir
+      file: path=/var/jenkins_home state=directory
+
+    - name: Start the Jenkins container instance
+      docker:
+        name: jenkins
+        image: jenkins:latest
+        ports:
+          - 8080:8080
+          - 50000:50000
+        volumes: /var/jenkins_home

@@ -1,0 +1,24 @@
+---
+- name: download dokuwiki
+  get_url: url=http://download.dokuwiki.org/src/dokuwiki/dokuwiki-2015-08-10a.tgz dest=/tmp/dokuwiki.tgz
+
+- name: ensure dokuwiki folder exists.
+  file: "path=/srv/dokuwiki state=directory"
+
+- name: unpack dokuwiki archive
+  command: tar xzf /tmp/dokuwiki.tgz --strip=1 -C /srv/dokuwiki
+
+- name: move dokuwiki data dir
+  command: mv /srv/dokuwiki/data /srv/dokuwiki/data.dist 
+
+- name: move dokuwiki conf dir
+  command: mv /srv/dokuwiki/conf /srv/dokuwiki/conf.dist
+
+- name: Install packages for supervisor
+  apt: "name=supervisor state=present"
+
+- name: install supervisor configuration files
+  copy: src=supervisord.conf dest=/etc/supervisord.conf
+
+- name: install launch script
+  copy: src=run.sh dest=/run.sh mode=0755
