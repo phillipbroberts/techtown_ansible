@@ -7,8 +7,6 @@
     
 - name: Install the ntp.conf template file
   template: src=ntp.conf.j2 dest=/etc/ntp.conf
-  notify: 
-   - restart ntp
    
 - name: restart ntp
   service: name="ntpd" state=restarted enabled=yes
