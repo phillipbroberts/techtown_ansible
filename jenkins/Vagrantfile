@@ -1,0 +1,17 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "techtown/ubuntu-16.04"
+  config.vm.hostname = "jenkins"
+
+  [8080, 8443, 50000].each do |i|
+    config.vm.network "forwarded_port", guest: "#{i}", host: "#{i}"
+  end
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
+
+  config.vm.provision "shell", path: "bootstrap.sh"
+end

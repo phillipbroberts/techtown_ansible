@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+# jenkins_lxc_scripts::spinup_lxc - spin up a lxc container to run tests in
+# Written by Mitchell Smith <mitchinseattle2014@gmail.com> 2016/06/01
+#
+# Usage: sudo spinup_lxc [<base container>]
+#
+
+set -e
+
+if [ -z "$WORKSPACE" ]; then
+  echo "error: WORKSPACE not set" >&2
+  exit 1
+fi
+
+if [ -z $1 ]; then
+  echo "error: base container not specified" >&2
+  exit 1
+else
+  BASENAME=$1
+fi
+
+  if [ -z "$BUILD_TAG" ]; then
+    echo "warning: BUILD_TAG not set; defaulting to 'test'" >&2
+    export BUILD_TAG='test'
+  fi
+
+  if [ ${#BUILD_TAG} -gt 56 ]; then
+    CLONENAME="build-$(echo -n $BUILD_TAG|sha1sum|awk '{print toupper($1)}')"
+  else
+    CLONENAME="build-$(echo -n $BUILD_TAG | sed s/\[=,\]/-/g)"
+  fi
+
+LXC_PATH=`lxc-config lxc.lxcpath`
+MOUNTPOINT="${LXC_PATH}/${CLONENAME}/rootfs"
+
+lxc-copy -n "${BASENAME}" -N "${CLONENAME}"
+
+mount -o bind "${WORKSPACE}" "${MOUNTPOINT}/var/lib/jenkins"
+
+lxc-start -n "${CLONENAME}" -d
+lxc-wait -n "${CLONENAME}" -s "RUNNING"
+
+echo -n "waiting for IP address "
+until lxc-info -n "${CLONENAME}" | grep -q 'IP'; do 
+    echo -n "."; sleep 1
+done
+
+lxc-info -i -n "${CLONENAME}"

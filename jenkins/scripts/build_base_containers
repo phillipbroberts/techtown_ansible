@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+my $quiet = 0;
+GetOptions( "quiet" => \$quiet );
+
+sub notice {
+  my $msg = shift;
+  unless ($quiet) {
+    print "$msg\n";
+  }
+}
+
+sub fail {
+  my $msg = shift;
+  die "Error: $msg\n";
+}
+
+sub run_cmd {
+  my $container = shift;
+  my $cmd       = shift;
+  notice("Running $container: $cmd");
+  system("lxc-attach -n $container -- $cmd");
+}
+
+sub yum_install {
+  my $container = shift;
+  my $pkg       = shift;
+  run_cmd( $container, "yum --quiet --assumeyes install $pkg" );
+}
+
+sub apt_install {
+  my $container = shift;
+  my $pkg       = shift;
+  run_cmd( $container, "apt-get -qqy --no-install-recommends install $pkg" );
+}
+
+sub gem_install {
+  my $container = shift;
+  my $pkg       = shift;
+  run_cmd( $container, "gem install $pkg --no-ri --no-rdoc" );
+}
+
+sub create_container {
+  my $dist      = shift;
+  my $release   = shift;
+  my $container = $dist . "-" . $release . "-base";
+  notice("Building container $container");
+  system("lxc-create -t download -n $container -- --dist $dist --release $release --arch amd64");
+  notice("Starting container $container");
+  system("lxc-start -d -n $container");
+  return $container;
+}
+
+sub stop_container {
+  my $container = shift;
+  run_cmd( $container, "halt" );
+}
+
+my $jenkins_uid = getpwnam("jenkins");
+my $jenkins_gid = getgrnam("jenkins");
+
+my $centos_container = create_container( "centos", "7" );
+system("sleep 15");
+run_cmd( $centos_container, "yum --quiet --assumeyes update" );
+run_cmd( $centos_container, "yum --quiet --assumeyes upgrade" );
+yum_install( $centos_container, "epel-release" );
+yum_install( $centos_container, "git" );
+yum_install( $centos_container, "ansible" );
+yum_install( $centos_container, "ruby rubygems" );
+gem_install( $centos_container, "bundler" );
+gem_install( $centos_container, "serverspec" );
+run_cmd( $centos_container, "yum clean all" );
+run_cmd( $centos_container, "groupadd -g $jenkins_gid jenkins" );
+run_cmd( $centos_container, "useradd -g jenkins -u $jenkins_uid -d /var/lib/jenkins -s /bin/bash jenkins" );
+stop_container($centos_container);
+
+my $ubuntu_container = create_container( "ubuntu", "xenial" );
+system("sleep 15");
+run_cmd( $ubuntu_container, "apt-get -qq update" );
+run_cmd( $ubuntu_container, "apt-get -qqy upgrade" );
+apt_install( $ubuntu_container, "software-properties-common" );
+run_cmd( $ubuntu_container, "add-apt-repository -y ppa:ansible/ansible" );
+run_cmd( $ubuntu_container, "apt-get -qq update" );
+apt_install( $ubuntu_container, "ansible" );
+apt_install( $ubuntu_container, "git" );
+apt_install( $ubuntu_container, "ruby ruby2.3" );
+gem_install( $ubuntu_container, "bundler" );
+gem_install( $ubuntu_container, "serverspec" );
+run_cmd( $ubuntu_container, "apt-get clean" );
+run_cmd( $ubuntu_container, "groupadd -g $jenkins_gid jenkins" );
+run_cmd( $ubuntu_container, "useradd -g jenkins -u $jenkins_uid -d /var/lib/jenkins -s /bin/bash jenkins" );
+stop_container($ubuntu_container);
+

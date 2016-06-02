@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# jenkins_lxc_scripts::run_lxc - run command inside an lxc container
+# Written by Mitchell Smith <mitchinseattle2014@gmail.com> 2016/06/01
+#
+# usage: sudo run_lxc <command>...
+#
+
+  if [ -z "$BUILD_TAG" ]; then
+    echo "warning: BUILD_TAG not set; defaulting to 'test'" >&2
+    export BUILD_TAG='test'
+  fi
+
+  if [ ${#BUILD_TAG} -gt 56 ]; then
+    CLONENAME="build-$(echo -n $BUILD_TAG|sha1sum|awk '{print toupper($1)}')"
+  else
+    CLONENAME="build-$(echo -n $BUILD_TAG | sed s/\[=,\]/-/g)"
+  fi
+
+lxc-attach -n "${CLONENAME}" -- $@

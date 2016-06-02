@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# jenkins_lxc_scripts::teardown_lxc - stop and remove an lxc container when it's no longer in use
+# Written by Mitchell Smith <mitchinseattle2014@gmail.com> 2016/06/01
+#
+# Usage: sudo teardown_lxc [<build tag> ...]
+#
+
+set -e
+
+if [ -z "$BUILD_TAG" ]; then
+    echo "warning: BUILD_TAG not set; defaulting to 'test'" >&2
+    export BUILD_TAG='test'
+  fi
+
+  if [ ${#BUILD_TAG} -gt 56 ]; then
+    CLONENAME="build-$(echo -n $BUILD_TAG|sha1sum|awk '{print toupper($1)}')"
+  else
+    CLONENAME="build-$(echo -n $BUILD_TAG | sed s/\[=,\]/-/g)"
+  fi
+
+remove() {
+  echo "shutting down and destroying $CLONENAME"
+  LXC_PATH=`lxc-config lxc.lxcpath`
+  MOUNTPOINT="${LXC_PATH}/${CLONENAME}/rootfs"
+    state=`lxc-info --state --no-humanize --name "${CLONENAME}"`
+    [ "$state" == "STOPPED" ] || lxc-stop -n "${CLONENAME}"
+
+    mountpoint -q "${MOUNTPOINT}/var/lib/jenkins" && umount "${MOUNTPOINT}/var/lib/jenkins"
+    mountpoint -q "${MOUNTPOINT}" && umount "${MOUNTPOINT}"
+    lxc-destroy -n "${CLONENAME}"
+}
+
+if [ $# -gt 0 ]; then
+    for tag in "$@"; do
+        CLONENAME="build-$tag"
+        remove
+    done
+else
+    remove
+fi
+
