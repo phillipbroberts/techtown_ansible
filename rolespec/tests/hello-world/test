@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# This gives you access to the custom DSL
+. "${ROLESPEC_LIB}/main"
+
+install_ansible "v2.0.2.0"
+
+#   - Run the playbook
+assert_playbook_runs
+
+ # check for no changes on the second run
+assert_playbook_idempotent
+
+# make sure node is installed
+assert_path /usr/bin/node
+
+# check the app has been installed in the correct location
+assert_path /opt/webapps/app/app.js
+
+# check that the app is listening for http requests
+assert_url http://localhost:8080/
+ 

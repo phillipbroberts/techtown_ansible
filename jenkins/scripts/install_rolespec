@@ -1,0 +1,13 @@
+#!/bin/bash
+
+ROLESPEC_REPO="https://github.com/nickjj/rolespec.git"
+INST_DIR="/tmp/rolespec"
+CURRENT_DIR=`pwd`
+
+echo "Installing Rolespec"
+git clone $ROLESPEC_REPO $INST_DIR
+cd $INST_DIR
+make install
+cd $CURRENT_DIR
+rm -rf $INST_DIR
+

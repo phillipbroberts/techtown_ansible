@@ -1,0 +1,29 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$install_rolespec = <<SCRIPT
+ROLESPEC_REPO=\"https://github.com/nickjj/rolespec.git\"
+INST_DIR=\"/tmp/rolespec\"
+
+echo \"Installing epel-release\"
+yum --quiet --assumeyes install epel-release
+
+echo \"Installing required packages\"
+yum --quiet --assumeyes install python make patch git
+
+echo \"Installing Rolespec\"
+git clone $ROLESPEC_REPO $INST_DIR
+cd $INST_DIR
+make install
+
+echo \"Cleaning up\"
+yum clean all
+cd $HOME
+rm -rf $INST_DIR
+SCRIPT
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "techtown/centos-7.2"
+  config.vm.hostname = "rolespec"
+  config.vm.provision "shell", inline: $install_rolespec
+end
