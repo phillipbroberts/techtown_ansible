@@ -1,32 +1,12 @@
-#
-# This file MUST be edited with the 'visudo' command as root.
-#
-# Please consider adding local content in /etc/sudoers.d/ instead of
-# directly modifying this file.
-#
-# See the man page for details on how to write a sudoers file.
-#
-Defaults	env_reset
-Defaults	exempt_group=sudo
-Defaults	mail_badpass
-Defaults	secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-
-# Host alias specification
-
-# User alias specification
-
-# Cmnd alias specification
-Cmnd_Alias LXC_CMDS = /usr/bin/lxc-attach /usr/bin/lxc-clone /usr/bin/lxc-create /usr/bin/lxc-destroy /usr/bin/lxc-start /usr/bin/lxc-stop
+Defaults      env_reset
+Defaults:jenkins !requiretty
 
 # User privilege specification
-root	ALL=(ALL:ALL) ALL
+root          ALL=(ALL) ALL
+%sudo ALL=(ALL) NOPASSWD:ALL
+%wheel ALL=(ALL) NOPASSWD:ALL
+vagrant ALL=(ALL) NOPASSWD:ALL
+jenkins ALL=(ALL) NOPASSWD:SETENV:ALL
 
-# Allow members of group sudo to execute any command
-%sudo	ALL=(ALL) NOPASSWD:ALL
-
-# lxc commands for jenkins
-jenkins ALL=(ALL) NOPASSWD: LXC_CMDS
-
-# See sudoers(5) for more information on "#include" directives:
-
+# This is not a comment; see sudoers(5) for more information on "#include" directives
 #includedir /etc/sudoers.d

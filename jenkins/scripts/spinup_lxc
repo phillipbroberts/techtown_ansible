@@ -20,6 +20,11 @@ else
   BASENAME=$1
 fi
 
+if [ ! -z $2 ]; then
+  ALT_WORKSPACE=$2
+fi
+
+
   if [ -z "$BUILD_TAG" ]; then
     echo "warning: BUILD_TAG not set; defaulting to 'test'" >&2
     export BUILD_TAG='test'
@@ -36,7 +41,11 @@ MOUNTPOINT="${LXC_PATH}/${CLONENAME}/rootfs"
 
 lxc-copy -n "${BASENAME}" -N "${CLONENAME}"
 
-mount -o bind "${WORKSPACE}" "${MOUNTPOINT}/var/lib/jenkins"
+if [ -z $ALT_WORKSPACE ]; then
+  mount -o bind "${WORKSPACE}" "${MOUNTPOINT}/var/lib/jenkins"
+else
+mount -o bind "${ALT_WORKSPACE}" "${MOUNTPOINT}/var/lib/jenkins"
+fi
 
 lxc-start -n "${CLONENAME}" -d
 lxc-wait -n "${CLONENAME}" -s "RUNNING"
@@ -46,4 +55,5 @@ until lxc-info -n "${CLONENAME}" | grep -q 'IP'; do
     echo -n "."; sleep 1
 done
 
+sleep 5
 lxc-info -i -n "${CLONENAME}"

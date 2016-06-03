@@ -17,4 +17,4 @@
     CLONENAME="build-$(echo -n $BUILD_TAG | sed s/\[=,\]/-/g)"
   fi
 
-lxc-attach -n "${CLONENAME}" -- $@
+lxc-attach -n "${CLONENAME}" -- sudo -iHE -u jenkins "$@"

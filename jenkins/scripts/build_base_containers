@@ -62,14 +62,18 @@ sub stop_container {
 
 my $jenkins_uid = getpwnam("jenkins");
 my $jenkins_gid = getgrnam("jenkins");
+my $lxcpath     = `lxc-config lxc.lxcpath`;
+chomp($lxcpath);
 
 my $centos_container = create_container( "centos", "7" );
+my $centos_container_path = $lxcpath . "/" . $centos_container . "/rootfs";
 system("sleep 15");
 run_cmd( $centos_container, "yum --quiet --assumeyes update" );
 run_cmd( $centos_container, "yum --quiet --assumeyes upgrade" );
 yum_install( $centos_container, "epel-release" );
 yum_install( $centos_container, "git" );
 yum_install( $centos_container, "ansible" );
+yum_install( $centos_container, "sudo" );
 yum_install( $centos_container, "ruby rubygems" );
 gem_install( $centos_container, "bundler" );
 gem_install( $centos_container, "serverspec" );
@@ -77,8 +81,10 @@ run_cmd( $centos_container, "yum clean all" );
 run_cmd( $centos_container, "groupadd -g $jenkins_gid jenkins" );
 run_cmd( $centos_container, "useradd -g jenkins -u $jenkins_uid -d /var/lib/jenkins -s /bin/bash jenkins" );
 stop_container($centos_container);
+system("cp /etc/sudoers $centos_container_path/etc/sudoers");
 
 my $ubuntu_container = create_container( "ubuntu", "xenial" );
+my $ubuntu_container_path = $lxcpath . "/" . $ubuntu_container . "/rootfs";
 system("sleep 15");
 run_cmd( $ubuntu_container, "apt-get -qq update" );
 run_cmd( $ubuntu_container, "apt-get -qqy upgrade" );
@@ -87,6 +93,7 @@ run_cmd( $ubuntu_container, "add-apt-repository -y ppa:ansible/ansible" );
 run_cmd( $ubuntu_container, "apt-get -qq update" );
 apt_install( $ubuntu_container, "ansible" );
 apt_install( $ubuntu_container, "git" );
+apt_install( $ubuntu_container, "sudo" );
 apt_install( $ubuntu_container, "ruby ruby2.3" );
 gem_install( $ubuntu_container, "bundler" );
 gem_install( $ubuntu_container, "serverspec" );
@@ -94,4 +101,5 @@ run_cmd( $ubuntu_container, "apt-get clean" );
 run_cmd( $ubuntu_container, "groupadd -g $jenkins_gid jenkins" );
 run_cmd( $ubuntu_container, "useradd -g jenkins -u $jenkins_uid -d /var/lib/jenkins -s /bin/bash jenkins" );
 stop_container($ubuntu_container);
+system("cp /etc/sudoers $ubuntu_container_path/etc/sudoers");
 
